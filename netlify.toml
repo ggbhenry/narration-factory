@@ -1,0 +1,31 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+  # music-metadata and @netlify/blobs are bundled automatically by esbuild
+  # from node_modules; nothing needs to be marked external.
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# SPA fallback: any route that is not a real file or a /api/* function call
+# should be served index.html so client-side routing keeps working.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
